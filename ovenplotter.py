@@ -26,10 +26,11 @@ def plot(filename):
     with open(filename,'r') as file:
         reader = csv.reader(file,delimiter='\t')
         for timestamp,thermo,internal in reader:
-            temp = thermo.split('t')
-            temp2 = temp[1].split('*C')
-            thermos.append(float(temp2[0]))
-
+            #print(thermo)
+            temp = thermo.split('*C')
+            #temp2 = temp[1].split('*C')
+            thermos.append(float(temp[0]))
+            #print(timestamp)
             if(i==0):
                 t1 = datetime.strptime(timestamp,timestampFormat)
                 startOfTime = t1.hour*60*60+t1.minute*60+t1.second+t1.microsecond/1e6
@@ -43,8 +44,8 @@ def plot(filename):
                 
     diffs = numpy.diff(thermos)
 
-
     plt.subplot(2,1,1)
+    plt.title(filename)
     plt.plot(timestamps,thermos)
     plt.ylabel('Temperatur [C]')
     plt.xlabel('Tid [s]')
