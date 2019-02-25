@@ -18,6 +18,7 @@ def plot(filename):
 
     timestamps = []
     thermos = []
+    dutycycles = []
     diffs = []
     timestampFormat = '%H:%M:%S.%f'
     i = 0
@@ -25,9 +26,10 @@ def plot(filename):
     #with open('oven-testing.log','r') as file:
     with open(filename,'r') as file:
         reader = csv.reader(file,delimiter='\t')
-        for timestamp,thermo,internal in reader:
-            #print(thermo)
+        for timestamp,thermo,internal,dutycycle in reader:
+            
             temp = thermo.split('*C')
+            dutycycles.append(int(dutycycle))
             #temp2 = temp[1].split('*C')
             thermos.append(float(temp[0]))
             #print(timestamp)
@@ -42,16 +44,28 @@ def plot(filename):
                 elapsedTime = t1.hour*60*60+t1.minute*60+t1.second+t1.microsecond/1e6-startOfTime
                 timestamps.append(elapsedTime)
                 
-    diffs = numpy.diff(thermos)
+    diffs = numpy.diff(thermos,4)
 
-    plt.subplot(2,1,1)
+
+    plt.style.use('dark_background')
+    plt.subplot(3,1,1)
     plt.title(filename)
-    plt.plot(timestamps,thermos)
+    plt.plot(timestamps,thermos,'r')
     plt.ylabel('Temperatur [C]')
     plt.xlabel('Tid [s]')
     plt.grid()
-    plt.subplot(2,1,2)
+    #plt.show()
+    plt.subplot(3,1,2)
 
+    #plt.figure()
+    plt.plot(timestamps,dutycycles,'g')
+    #plt.gca().invert_yaxis()
+    plt.ylabel('Dutycycle [%]')
+    plt.xlabel('Tid [s]')
+    plt.grid()
+
+    plt.subplot(3,1,3)
+    #plt.plot(timestamps[1:len(timestamps)],diffs)
     plt.plot(diffs)
     plt.grid()
     plt.show()
