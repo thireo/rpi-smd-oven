@@ -77,32 +77,40 @@ def reflow(filename):
                 dutycycle = 25
                 continue
         elif(state == 1): #SOAKING
-            if(lasttime+90 < datetime.now().timestamp()):
+            if(lasttime+(60*4) < datetime.now().timestamp()): 
                 state = 2
                 dutycycle = 100
                 continue
             if(temp > 170):
                 dutycycle = 0
             else:
-                dutycycle = 50
+                dutycycle = 75
         elif(state == 2): #REFLOW
-            if(temp < 240):
-                dutycycle = 100
-            elif(temp < 249):
-                dutycycle = 50
-            elif(temp >= 249):
-                dutycycle = 0
+            if(temp > 230):
                 state = 3
+                lasttime = datetime.now().timestamp()
+                print(datetime.now().timestamp(),'state=3')
                 continue
             else:
+                dutycycle = 100
+        elif(state == 3):
+            if(lasttime+70 < datetime.now().timestamp()):
                 dutycycle = 0
-                print('ERROR IN STAGE: %d'%state)
-        elif(state == 3): #COOLING
+                state = 4
+                continue
+            if(temp < 238):
+                dutycycle = 100
+            else:
+                dutycycle = 0
+        elif(state == 4): #COOLING
             dutycycle = 0
             print('COOLING PHASE!!!')
+        else:
+            print('STATE ERROR')
         with open((str(datetime.now().date())+'-%s.log'%filename),'a') as f:
-            teststring = str(datetime.now().time())+'\t%3f*C\t%3f*C\t%3d'%(temp,internal,dutycycle)
-            print('State:\t',state,' : ',teststring)
+            teststring = str(datetime.now().time())+'\t%3f*C\t%3f*C\t%3d\t%3d'%(temp,internal,dutycycle,state)
+            #print('State:\t',state,' : ',teststring)
+            print(teststring)
             teststring += '\n'
             f.write(teststring)
         pwm.ChangeDutyCycle(dutycycle)

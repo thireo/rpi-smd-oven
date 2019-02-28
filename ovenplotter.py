@@ -20,16 +20,18 @@ def plot(filename):
     thermos = []
     dutycycles = []
     diffs = []
+    states = []
     timestampFormat = '%H:%M:%S.%f'
     i = 0
     print('Loading: ',filename,'...')
     #with open('oven-testing.log','r') as file:
     with open(filename,'r') as file:
         reader = csv.reader(file,delimiter='\t')
-        for timestamp,thermo,internal,dutycycle in reader:
+        for timestamp,thermo,internal,dutycycle,state in reader:
             
             temp = thermo.split('*C')
             dutycycles.append(int(dutycycle))
+            states.append(int(state)*25)
             #temp2 = temp[1].split('*C')
             thermos.append(float(temp[0]))
             #print(timestamp)
@@ -59,6 +61,7 @@ def plot(filename):
 
     #plt.figure()
     plt.plot(timestamps,dutycycles,'g')
+    plt.plot(timestamps,states,'b')
     #plt.gca().invert_yaxis()
     plt.ylabel('Dutycycle [%]')
     plt.xlabel('Tid [s]')
