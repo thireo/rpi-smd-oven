@@ -46,17 +46,21 @@ def plot(filename):
                 elapsedTime = t1.hour*60*60+t1.minute*60+t1.second+t1.microsecond/1e6-startOfTime
                 timestamps.append(elapsedTime)
 
+    dffs = []
     t = []
     tt = []
     ttt = []
-    thermos[0]=0
-    thermos[1]=0
+    #thermos[0]=0
+    #thermos[1]=0
+    firstval = thermos[0]
+    print('firstval:\t%d'%firstval)
     t.append(0)
     t.append(0)
     for i in range(len(thermos)):
         ttt.append(thermos[i])
         if(i > 1):
-            thermos[i] = (thermos[i]- thermos[0])/0.25
+            thermos[i] = (thermos[i]- firstval)#/0.25
+            dffs.append((thermos[i]-thermos[i-1])/(timestamps[i]-timestamps[i-1]))
     thermos[0]=0
     thermos[1]=0
     print(thermos[0:4])
@@ -66,9 +70,9 @@ def plot(filename):
 
     tt.append(0)
     tt.append(0)
-    for i in range(len(diffs)):
+    for i in range(len(dffs)):
         if(i > 1):
-            t.append((diffs[i]*0.01+0.99*t[i-1]))
+            t.append((dffs[i]*0.1+0.9*t[i-1]))
             tt.append((t[i]*0.1+0.9*tt[i-1]))
 
     d = []
@@ -78,47 +82,55 @@ def plot(filename):
             #print(d[i-1])
     convv = [0]*(len(tt)+15000)
     dcs = []
-    dc = 1
-    kp = 2.15#50
-    kd = 65#7500
-    ki = 0.002#1
+    dc = 3
+    kp = 2#0.6#4.5#50
+    kd = 1#2500#100#7500
+    ki = 0.001#0.0005#0.0035#1
     di = 0
+    ed = 0
     dis = []
     ed = 0
     eds = []
     ds = []
-    desire = 150
+    dt = 1
+    desire = 90-firstval
 
+    for k in range(len(tt)):
+        tt[k] = tt[k]*4
+
+    bob = []
     for i in range(15000):
         if(i>5000):
-            desire = 215
+            desire = 130-firstval
         if(i>7500):
-            desire = 245
+            desire = 138-firstval
         if(i>10000):
-            desire = 0
-        ds.append(desire)
-        di += (desire-convv[i])*0.25*ki
+            desire = 165-firstval
+        ds.append(desire+firstval)
+        di += (desire-convv[i])*dt*ki
         dis.append(di)
         if(i > 1):
-            ed = (((convv[i-1]-desire)-(convv[i]-desire))/0.25)*kd
+            ed = (((convv[i-1]-desire)-(convv[i]-desire))/dt)*kd
             eds.append(ed)
         dc = (((desire-convv[i])*kp)+ed+di)/100
-        if(dc > 4):
-            dc = 4
+        if(dc > 3):
+            dc = 3
         elif(dc < 0):
             dc = 0
         dcs.append(dc)
-        for k in range(len(tt)):
-            convv[k+i] += tt[k]*dc
-        #convv[i] += 32
+
+        for k in range(len(t)):
+            convv[k+i] += t[k]*dc
+        convv[i] = convv[i] + firstval
+        #bob.append(convv[i]-thermos[i])
 
         
 
     plt.style.use('dark_background')
     plt.subplot(3,1,1)
     plt.title(filename)
-    #plt.plot(timestamps,thermos,'r')
-    plt.plot(eds)
+    plt.plot(timestamps,thermos,'r')
+    #plt.plot(eds)
     plt.ylabel('Temperatur [C]')
     plt.xlabel('Tid [s]')
     plt.grid()
@@ -131,6 +143,8 @@ def plot(filename):
     #plt.plot(timestamps,states,'b')
     #plt.gca().invert_yaxis()
     plt.plot(dcs,'r')
+    #plt.plot(t)
+    #plt.plot(bob)
     #plt.plot(eds,'b')
     plt.ylabel('Dutycycle [%]')
     plt.xlabel('Tid [s]')
@@ -142,9 +156,11 @@ def plot(filename):
     #plt.plot(diffs)
     plt.plot(ds,'g')
     plt.plot(convv,'r')
+    #plt.plot(timestamps,thermos,'b')
     #plt.plot(ttt,'b')
     plt.xlim(0,len(dcs))
     plt.grid()
+    plt.legend(['desired','calc.','meas.'])
     plt.show()
 
 def chipquik():

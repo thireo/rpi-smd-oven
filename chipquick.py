@@ -81,12 +81,12 @@ def reflow(filename):
                 state = 2
                 dutycycle = 100
                 continue
-            if(temp > 170):
+            if(temp > 175):
                 dutycycle = 0
             else:
                 dutycycle = 75
         elif(state == 2): #REFLOW
-            if(temp > 230):
+            if(temp > 235):
                 state = 3
                 lasttime = datetime.now().timestamp()
                 print(datetime.now().timestamp(),'state=3')
@@ -98,7 +98,7 @@ def reflow(filename):
                 dutycycle = 0
                 state = 4
                 continue
-            if(temp < 238):
+            if(temp < 245):
                 dutycycle = 100
             else:
                 dutycycle = 0
