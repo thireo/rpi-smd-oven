@@ -1,6 +1,6 @@
 EESchema Schematic File Version 4
 LIBS:rpismdoven-cache
-EELAYER 26 0
+EELAYER 30 0
 EELAYER END
 $Descr A4 11693 8268
 encoding utf-8
@@ -26,7 +26,7 @@ F 3 "https://www.raspberrypi.org/documentation/hardware/raspberrypi/schematics/r
 	1    0    0    -1  
 $EndComp
 $Comp
-L Sensor_Temperature:MAX31855TASA U1
+L rpismdoven-rescue:MAX31855TASA-Sensor_Temperature U1
 U 1 1 5C862CC5
 P 8450 2925
 F 0 "U1" H 8650 2575 50  0000 C CNN
